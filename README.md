@@ -6,6 +6,6 @@
 
 **ПЗ1:** Правила оформлення програмного коду в JavaScript згідно зі стандартом Google JavaScript Style Guide: іменування, структура коду, стильові рекомендації
 
-**ПЗ2:** Застосування методів рефакторингу Extract Method, Inline Method та Simplify Conditional Expression для покращення читабельності та підтримуваності React-компонентів
+**ПЗ2:** Застосування методів рефакторингу Move Method, Inline Method та Replace Conditional with Polymorphism для покращення читабельності та підтримуваності React-компонентів
 
 **Міні-проєкт ЛР:** 
