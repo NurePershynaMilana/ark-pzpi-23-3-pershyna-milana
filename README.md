@@ -6,6 +6,6 @@
 
 **ПЗ1:**  Правила оформлення програмного коду в JavaScript - іменування, структура коду, коментарі та документація
 
-**ПЗ2:** Застосування методів Extract Method, Replace Temp with Query та Simplify Conditional Expression для покращення читабельності та підтримуваності програмного коду
+**ПЗ2:** Застосування методів Extract Method, Inline Method та Simplify Conditional Expression для покращення читабельності та підтримуваності програмного коду в JavaScript
 
 **Міні-проєкт ЛР:** 
