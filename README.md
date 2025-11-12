@@ -4,9 +4,9 @@
 
 Першина Мілана
 
-**ПЗ1:** Правила оформлення програмного коду в JavaScript згідно зі стандартом Google JavaScript Style Guide: іменування, структура коду, стильові рекомендації в React проєктах
+Правила оформлення програмного коду в JavaScript згідно зі стандартом Google JavaScript Style Guide: іменування, структура коду, стильові рекомендації в React проєктах
 
-**ПЗ2:** Застосування методів рефакторингу Move Method, Inline Method та Replace Conditional with Polymorphism для покращення читабельності та підтримуваності React-компонентів
+Застосування методів рефакторингу Move Method, Inline Method та Replace Conditional with Polymorphism для покращення читабельності та підтримуваності компонентів в React проєктах
 
 **Міні-проєкт ЛР:** 
 
