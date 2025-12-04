@@ -1,0 +1,329 @@
+МІНІСТЕРСТВО ОСВІТИ І НАУКИ УКРАЇНИ
+ 
+ХАРКІВСЬКИЙ НАЦІОНАЛЬНИЙ
+УНІВЕРСИТЕТ РАДІОЕЛЕКТРОНІКИ
+ 
+Кафедра «Програмна інженерія»
+ 
+ 
+
+
+ЗВІТ
+до практичного завдання 2
+з дисципліни «Застосування методів рефакторингу Move Method, Inline Method та Replace Conditional with Polymorphism для покращення читабельності та підтримуваності компонентів в React проєктах»
+
+ 
+
+
+ 
+
+
+
+
+
+Виконав:                                                           	              	                Перевірив:
+ст. гр. ПЗПІ-23-3                                     	       	     	     ст. викладач катедри ПІ
+Першина М. А.                                     	       	     	    Сокорчук Ігор Петрович
+
+
+
+
+
+
+
+
+Харків 2025
+ 
+1 ІСТОРІЯ ЗМІН
+№	Дата	Версія звіту	Опис змін та виправлень
+1	01.12.2025	0.1	Початок роботи над презентацією і доповіддю
+2	04.12.2025	0.2	Доопрацювання звіту та відеозапису
+
+
+2 ЗАВДАННЯ
+Застосування методів рефакторингу Move Method, Inline Method та Replace Conditional with Polymorphism для покращення читабельності та підтримуваності компонентів в React проєктах
+
+3 ОПИС ВИКОНАНОЇ РОБОТИ
+У сучасній React розробці підтримання якості коду набуває критичного значення, оскільки компоненти швидко ростуть у складності та потребують постійного вдосконалення без втрати функціональності. Рефакторинг як дисципліна забезпечує еволюцію кодової бази, дозволяючи адаптувати архітектуру до нових вимог та покращувати її внутрішню структуру.
+Застосування методів Move Method, Inline Method та Replace Conditional with Polymorphism у React проєктах дозволяє досягти високого рівня організації коду завдяки чіткому розділенню відповідальності, усуненню надмірної абстракції та заміні умовних конструкцій більш гнучкими рішеннями. Цей підхід базується на принципах єдиної відповідальності, мінімізації когнітивного навантаження та максимізації можливостей розширення функціональності.
+Метод Move Method адресує проблему неправильного розміщення логіки в компонентах React. Функції, які інтенсивно використовують дані з інших модулів або не відносяться до відображення інтерфейсу, переміщуються до відповідних місць у архітектурі. Практичне застосування включає винесення бізнес-логіки обчислень з компонентів у спеціалізовані модулі, створення окремих утилітарних функцій для валідації та трансформації даних, переміщення методів роботи з API до сервісних шарів. Результатом стає чітке розмежування між логікою представлення та бізнес-логікою, що значно спрощує тестування та подальшу підтримку системи.
+Inline Method вирішує протилежну проблему — надмірну фрагментацію простих операцій на окремі методи без додання цінності. В React контексті це особливо актуально для простих перевірок, які розбиті на множину тривіальних функцій. Метод передбачає об'єднання логічно пов'язаних операцій у зрозумілі блоки коду, усунення проміжних функцій-оберток для простих операцій, інтеграцію коротких обчислень безпосередньо в місця їх використання. Такий підхід зменшує кількість переходів між функціями при читанні коду та робить логіку більш очевидною.
+Replace Conditional with Polymorphism трансформує громіздкі умовні конструкції у гнучкі системи конфігурації або поліморфні структури. У React екосистемі це проявляється через створення об'єктів конфігурації для різних типів компонентів, використання паттерну Strategy для варіативного поведінки, заміну множинних if/else блоків на мапінг даних. Метод особливо ефективний для компонентів, які відображають різні типи контенту залежно від переданих параметрів, наприклад системи сповіщень, каталоги продуктів або форми з різними типами полів.
+Інтеграція цих методів у процес розробки вимагає систематичного підходу. Код-рев'ю має включати аналіз можливостей застосування рефакторингу, розробники повинні регулярно оцінювати складність своїх компонентів, а архітектурні рішення мають передбачати можливості майбутнього рефакторингу без порушення існуючої функціональності.
+Особливу увагу варто приділити тестуванню після рефакторингу. Move Method потребує перевірки правильності переміщення залежностей, Inline Method вимагає підтвердження збереження логіки після об'єднання, а Replace Conditional потребує валідації всіх варіантів поведінки через нову систему конфігурації.
+
+4 ВИСНОВКИ
+У ході роботи було детально розглянуто три фундаментальні методи рефакторингу: Move Method для оптимізації розміщення логіки між модулями, Inline Method для усунення надмірної абстракції та Replace Conditional with Polymorphism для заміни умовних конструкцій гнучкими рішеннями.
+Було здобуто практичні навички ідентифікації проблемних паттернів у React компонентах, зокрема виявлення неправильно розміщеної бізнес-логіки, розпізнавання надмірно фрагментованого коду та аналізу громіздких умовних блоків. Опрацьовано техніки безпечного рефакторингу з збереженням функціональності та методи валідації результатів через тестування.
+Застосування цих методів рефакторингу сприяє створенню більш читабельних та підтримуваних React додатків, покращує швидкість розробки нових функцій завдяки кращій організації коду, зменшує час на виправлення помилок через локалізацію відповідальності, а також полегшує масштабування проєктів та інтеграцію нових розробників у команду.
+
+5 ВИКОРИСТАНІ ДЖЕРЕЛА
+•	Martin Fowler - Refactoring: Improving the Design of Existing Code [Електронний ресурс]. – Режим доступу: https://refactoring.com/ – Дата доступу: 04.12.2025
+•	React Documentation – Best Practices [Електронний ресурс]. – Режим доступу: 
+https://react.dev/learn – Дата доступу: 04.12.2025.
+•	Clean Code: A Handbook of Agile Software Craftsmanship – Robert C. Martin [Електронний ресурс]. – Режим доступу: https://www.oreilly.com/library/view/clean-code-a/9780136083238/ – Дата доступу: 04.12.2025
+ 
+ДОДАТОК А
+Відеозапис
+Відеозапис доповіді: https://youtu.be/xc3LH4fCyM0
+Хронологічний опис відеозапису: 
+0:00 - Вступ 
+0:33 - Що таке рефакторинг 
+1:18 - Move Method 
+2:30 - Inline Method 
+3:34 - Replace conditional with polymorphism 
+6:20 - Порівняння методів 
+7:28 - Переваги застосування методів 
+8:27 - Підсумки 
+9:16 - Список використаних джерел
+
+ 
+ДОДАТОК Б
+Слайди презентації
+ 
+Рисунок Б.1 - Титульний слайд
+
+ 
+Рисунок Б.2 - Зміст презентації
+
+ 
+Рисунок Б.3 - Що таке рефакторинг?
+
+ 
+Рисунок Б.4 - Move Method
+
+ 
+Рисунок Б.5 - Inline Method
+
+ 
+Рисунок Б.6 - Replace conditional with polymorphism
+
+ 
+Рисунок Б.7 - Replace conditional: до рефакторингу
+
+ 
+Рисунок Б.8 - Replace conditional: після рефакторингу
+
+ 
+Рисунок Б.9 - Порівняння методів
+
+ 
+Рисунок Б.10 - Переваги застосування методів
+ 
+Рисунок Б.10 - Підсумки
+
+ 
+Рисунок Б.12 - Список Використаних джерел
+
+ 
+Рисунок Б.13 - Дякую за увагу!
+ 
+ДОДАТОК В
+Програмний код:
+Програмний код
+В.1 Move Method: До рефакторингу
+1  // ShoppingCart.jsx - компонент робить занадто багато
+2  function ShoppingCart({ items }) {
+3    const [cart, setCart] = useState(items);
+4    
+5    // Бізнес-логіка розрахунків у компоненті відображення
+6    const calculateTotal = () => {
+7      return cart.reduce((sum, item) => {
+8        const discount = item.price > 1000 ? 0.1 : 0;
+9        return sum + (item.price * item.quantity * (1 - discount));
+10     }, 0);
+11   };
+12   
+13   const calculateTax = () => {
+14     return calculateTotal() * 0.2;
+15   };
+16   
+17   const calculateShipping = () => {
+18     const total = calculateTotal();
+19     return total > 500 ? 0 : 50;
+20   };
+21   
+22   return (
+23     <div className="cart">
+24       <h2>Кошик</h2>
+25       {cart.map(item => (
+26         <div key={item.id}>{item.name}: {item.price} грн</div>
+27       ))}
+28       <p>Всього: {calculateTotal()} грн</p>
+29       <p>ПДВ: {calculateTax()} грн</p>
+30       <p>Доставка: {calculateShipping()} грн</p>
+31     </div>
+32   );
+33 }
+
+В.2 Move Method: Після рефакторингу
+1  // utils/cartCalculations.js
+2  export const CartCalculations = {
+3    calculateTotal(items) {
+4      return items.reduce((sum, item) => {
+5        const discount = item.price > 1000 ? 0.1 : 0;
+6        return sum + (item.price * item.quantity * (1 - discount));
+7      }, 0);
+8    },
+9    
+10   calculateTax(items) {
+11     return this.calculateTotal(items) * 0.2;
+12   },
+13   
+14   calculateShipping(items) {
+15     const total = this.calculateTotal(items);
+16     return total > 500 ? 0 : 50;
+17   }
+18 };
+19
+20 // ShoppingCart.jsx
+21 import { CartCalculations } from './utils/cartCalculations';
+22
+23 function ShoppingCart({ items }) {
+24   const [cart, setCart] = useState(items);
+25   
+26   return (
+27     <div className="cart">
+28       <h2>Кошик</h2>
+29       {cart.map(item => (
+30         <div key={item.id}>{item.name}: {item.price} грн</div>
+31       ))}
+32       <p>Всього: {CartCalculations.calculateTotal(cart)} грн</p>
+33       <p>ПДВ: {CartCalculations.calculateTax(cart)} грн</p>
+34       <p>Доставка: {CartCalculations.calculateShipping(cart)} грн</p>
+35     </div>
+36   );
+37 }
+
+В.3 Inline Method: До рефакторингу
+1  // UserProfile.jsx - надмірна абстракція
+2  function UserProfile({ user }) {
+3    const getEmail = () => {
+4      return user.email;
+5    };
+6    
+7    const hasEmail = () => {
+8      return getEmail() !== null;
+9    };
+10   
+11   const isEmailValid = () => {
+12     return hasEmail() && getEmail().includes('@');
+13   };
+14   
+15   const getAge = () => {
+16     return user.age;
+17   };
+18   
+19   const isAdult = () => {
+20     return getAge() >= 18;
+21   };
+22   
+23   const canPurchasePremium = () => {
+24     return isEmailValid() && isAdult();
+25   };
+26   
+27   return (
+28     <div className="profile">
+29       <h2>{user.name}</h2>
+30       <p>Email: {getEmail()}</p>
+31       {canPurchasePremium() && (
+32         <button className="btn-premium">Купити преміум</button>
+33       )}
+34     </div>
+35   );
+36 }
+
+В.4 Inline Method: Після рефакторингу
+1  // UserProfile.jsx - спрощена логіка
+2  function UserProfile({ user }) {
+3    const canPurchasePremium = 
+4      user.email?.includes('@') && user.age >= 18;
+5    
+6    return (
+7      <div className="profile">
+8        <h2>{user.name}</h2>
+9        <p>Email: {user.email}</p>
+10       {canPurchasePremium && (
+11         <button className="btn-premium">Купити преміум</button>
+12       )}
+13     </div>
+14   );
+15 }
+
+В.5 Replace Conditional with Polymorphism: До рефакторингу
+1  // NotificationMessage.jsx - громіздкі умови
+2  function NotificationMessage({ notification }) {
+3    if (notification.type === 'success') {
+4      return (
+5        <div className="notification success">
+6          <span className="icon">✓</span>
+7          <p style={{ color: 'green' }}>{notification.message}</p>
+8          <button onClick={notification.onClose}>Закрити</button>
+9        </div>
+10     );
+11   } else if (notification.type === 'error') {
+12     return (
+13       <div className="notification error">
+14         <span className="icon">✗</span>
+15         <p style={{ color: 'red' }}>{notification.message}</p>
+16         <button onClick={notification.onClose}>Закрити</button>
+17       </div>
+18     );
+19   } else if (notification.type === 'warning') {
+20     return (
+21       <div className="notification warning">
+22         <span className="icon">⚠</span>
+23         <p style={{ color: 'orange' }}>{notification.message}</p>
+24         <button onClick={notification.onClose}>Закрити</button>
+25       </div>
+26     );
+27   } else if (notification.type === 'info') {
+28     return (
+29       <div className="notification info">
+30         <span className="icon">ℹ</span>
+31         <p style={{ color: 'blue' }}>{notification.message}</p>
+32         <button onClick={notification.onClose}>Закрити</button>
+33       </div>
+34     );
+35   }
+36 }
+
+В.6 Replace Conditional with Polymorphism: Після рефакторингу
+1  // notificationConfig.js
+2  export const NOTIFICATION_CONFIG = {
+3    success: {
+4      icon: '✓',
+5      color: 'green',
+6      className: 'success'
+7    },
+8    error: {
+9      icon: '✗',
+10     color: 'red',
+11     className: 'error'
+12   },
+13   warning: {
+14     icon: '⚠',
+15     color: 'orange',
+16     className: 'warning'
+17   },
+18   info: {
+19     icon: 'ℹ',
+20     color: 'blue',
+21     className: 'info'
+22   }
+23 };
+24
+25 // NotificationMessage.jsx
+26 import { NOTIFICATION_CONFIG } from './notificationConfig';
+27
+28 function NotificationMessage({ notification }) {
+29   const config = NOTIFICATION_CONFIG[notification.type];
+30   
+31   return (
+32     <div className={`notification ${config.className}`}>
+33       <span className="icon">{config.icon}</span>
+34       <p style={{ color: config.color }}>{notification.message}</p>
+35       <button onClick={notification.onClose}>Закрити</button>
+36     </div>
+37   );
+38 }
