@@ -2,7 +2,7 @@ import { Request, Response } from 'express';
 import { Plant, PlantType, Sensor } from '../models';
 import { ApiResponse, CreatePlantRequest } from '../types';
 
-// GET /api/my-plants - Get current user's plants
+// GET /api/my-plants
 export const getMyPlants = async (req: Request, res: Response) => {
   try {
     const userId = req.user.user_id;
@@ -36,7 +36,7 @@ export const getMyPlants = async (req: Request, res: Response) => {
   }
 };
 
-// GET /api/my-plants/:id - Get specific user's plant
+// GET /api/my-plants/:id
 export const getMyPlantById = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
@@ -45,7 +45,7 @@ export const getMyPlantById = async (req: Request, res: Response) => {
     const plant = await Plant.findOne({
       where: { 
         plant_id: id,
-        user_id: userId // Only user's own plants
+        user_id: userId
       },
       include: [
         {
@@ -85,7 +85,7 @@ export const getMyPlantById = async (req: Request, res: Response) => {
   }
 };
 
-// POST /api/my-plants - Create new plant for current user
+// POST /api/my-plants
 export const createMyPlant = async (req: Request, res: Response) => {
   try {
     const userId = req.user.user_id;
@@ -100,7 +100,6 @@ export const createMyPlant = async (req: Request, res: Response) => {
       return res.status(400).json(response);
     }
     
-    // Check if plant type exists
     const plantType = await PlantType.findByPk(plant_type_id);
     if (!plantType) {
       const response: ApiResponse<null> = {
@@ -109,16 +108,14 @@ export const createMyPlant = async (req: Request, res: Response) => {
       };
       return res.status(400).json(response);
     }
-    
-    // Create plant with current user as owner
+
     const plant = await Plant.create({
       user_id: userId,
       plant_type_id,
       name,
       location
     });
-    
-    // Get created plant with relations
+
     const createdPlant = await Plant.findByPk(plant.plant_id, {
       include: [
         {
@@ -145,14 +142,13 @@ export const createMyPlant = async (req: Request, res: Response) => {
   }
 };
 
-// PUT /api/my-plants/:id - Update user's plant
+// PUT /api/my-plants/:id
 export const updateMyPlant = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
     const userId = req.user.user_id;
     const { name, location, plant_type_id } = req.body;
-    
-    // Find plant and verify ownership
+
     const plant = await Plant.findOne({
       where: { 
         plant_id: id,
@@ -167,8 +163,7 @@ export const updateMyPlant = async (req: Request, res: Response) => {
       };
       return res.status(404).json(response);
     }
-    
-    // Validate plant type if updating
+
     if (plant_type_id && plant_type_id !== plant.plant_type_id) {
       const plantType = await PlantType.findByPk(plant_type_id);
       if (!plantType) {
@@ -179,15 +174,13 @@ export const updateMyPlant = async (req: Request, res: Response) => {
         return res.status(400).json(response);
       }
     }
-    
-    // Update plant
+
     await plant.update({
       name: name || plant.name,
       location: location || plant.location,
       plant_type_id: plant_type_id || plant.plant_type_id
     });
-    
-    // Get updated plant with relations
+
     const updatedPlant = await Plant.findByPk(id, {
       include: [
         {
@@ -214,13 +207,12 @@ export const updateMyPlant = async (req: Request, res: Response) => {
   }
 };
 
-// DELETE /api/my-plants/:id - Delete user's plant
+// DELETE /api/my-plants/:id 
 export const deleteMyPlant = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
     const userId = req.user.user_id;
-    
-    // Find plant and verify ownership
+
     const plant = await Plant.findOne({
       where: { 
         plant_id: id,

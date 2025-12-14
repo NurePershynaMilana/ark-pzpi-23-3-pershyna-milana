@@ -3,12 +3,12 @@ import { Op } from 'sequelize';
 import { SensorData, Sensor, Plant, PlantType } from '../models';
 import { ApiResponse } from '../types';
 
-// Типы команд для исполнительных устройств
+
 interface DeviceCommand {
   device_type: 'watering' | 'lighting' | 'ventilation' | 'heating';
   action: 'start' | 'stop' | 'adjust';
   value?: number;
-  duration?: number; // в минутах
+  duration?: number; 
   priority: 'low' | 'medium' | 'high' | 'critical';
   reason: string;
 }
@@ -37,10 +37,10 @@ interface AnalysisResult {
   overall_status: 'healthy' | 'needs_attention' | 'critical';
 }
 
-// POST /api/sensors/analyze - Умный анализ данных датчиков
+// POST /api/sensors/analyze 
 export const analyzeSensorData = async (req: Request, res: Response) => {
   try {
-    const { hardware_ids } = req.body; // Массив ID датчиков для анализа
+    const { hardware_ids } = req.body;
     
     if (!hardware_ids || !Array.isArray(hardware_ids)) {
       return res.status(400).json({
@@ -49,11 +49,8 @@ export const analyzeSensorData = async (req: Request, res: Response) => {
       });
     }
 
-    console.log('🤖 Starting intelligent sensor analysis...');
-    
     const analysisResults: AnalysisResult[] = [];
     
-    // Находим все датчики и группируем по растениям
     const sensors = await Sensor.findAll({
       where: { 
         hardware_id: { [Op.in]: hardware_ids },
@@ -74,9 +71,6 @@ export const analyzeSensorData = async (req: Request, res: Response) => {
         }
       ]
     });
-
-    console.log('🔍 Found sensors:', sensors.length);
-    console.log('🔍 First sensor data:', JSON.stringify(sensors[0], null, 2));
     
     if (sensors.length === 0) {
       return res.status(400).json({
@@ -85,19 +79,10 @@ export const analyzeSensorData = async (req: Request, res: Response) => {
       });
     }
 
-    // Группируем датчики по растениям
     const plantSensors = new Map();
     sensors.forEach((sensor: any) => {
       const plantId = sensor.plant_id;
       const plant = sensor.plant;
-      
-      console.log('🔍 Sensor data:', {
-        sensor_id: sensor.sensor_id,
-        plant_id: plantId,
-        plant_name: plant?.name,
-        plant_type: plant?.plantType?.name,
-        hardware_id: sensor.hardware_id
-      });
       
       if (!plantSensors.has(plantId)) {
         plantSensors.set(plantId, {
@@ -108,36 +93,31 @@ export const analyzeSensorData = async (req: Request, res: Response) => {
       plantSensors.get(plantId).sensors.push(sensor);
     });
 
-    // Анализируем каждое растение
+
     for (const [plantId, { plant, sensors }] of plantSensors) {
-      console.log(`🔍 Analyzing plant: ${plant?.name || 'Unknown'} (ID: ${plantId})`);
       
       if (!plant) {
-        console.log(`⚠️ Skipping plant ${plantId} - missing plant data`);
+        console.log(`Skipping plant ${plantId} - missing plant data`);
         continue;
       }
 
-      // Получаем тип растения отдельно, если он не загрузился
+
       let plantType = plant.plantType;
       if (!plantType && plant.plant_type_id) {
         plantType = await PlantType.findByPk(plant.plant_type_id);
-        console.log('📋 Loaded plantType separately:', plantType?.name);
       }
 
       if (!plantType) {
-        console.log(`⚠️ Skipping plant ${plantId} - missing plantType data`);
+        console.log(`Skipping plant ${plantId} - missing plantType data`);
         continue;
       }
       
       const currentConditions: any = {};
       const sensorPromises = sensors.map(async (sensor: any) => {
-        // Получаем последние данные каждого датчика
         const latestData = await SensorData.findOne({
           where: { sensor_id: sensor.sensor_id },
           order: [['timestamp', 'DESC']]
         });
-        
-        console.log(`📊 Sensor ${sensor.hardware_id} (${sensor.sensor_type}):`, latestData?.value);
         
         if (latestData) {
           currentConditions[sensor.sensor_type] = latestData.value;
@@ -153,18 +133,9 @@ export const analyzeSensorData = async (req: Request, res: Response) => {
         watering_frequency: plantType?.watering_frequency || 0
       };
 
-      console.log('🌱 Plant data:', {
-        plant_id: plantId,
-        name: plant?.name,
-        type: plantType?.name,
-        optimal: optimalConditions
-      });
-
-      // Вычисляем отклонения
       const deviations: any = {};
       const recommendations: DeviceCommand[] = [];
 
-      // Анализ влажности
       if (currentConditions.humidity !== undefined) {
         const humidityDev = currentConditions.humidity - optimalConditions.humidity;
         deviations.humidity_deviation = Math.round(humidityDev * 100) / 100;
@@ -198,7 +169,6 @@ export const analyzeSensorData = async (req: Request, res: Response) => {
         }
       }
 
-      // Анализ температуры
       if (currentConditions.temperature !== undefined) {
         const tempDev = currentConditions.temperature - optimalConditions.temperature;
         deviations.temperature_deviation = Math.round(tempDev * 100) / 100;
@@ -223,7 +193,7 @@ export const analyzeSensorData = async (req: Request, res: Response) => {
         }
       }
 
-      // Анализ освещения
+
       if (currentConditions.light !== undefined) {
         const lightDev = currentConditions.light - optimalConditions.light;
         deviations.light_deviation = Math.round(lightDev);
@@ -249,7 +219,6 @@ export const analyzeSensorData = async (req: Request, res: Response) => {
         }
       }
 
-      // Определяем общий статус растения
       let overallStatus: 'healthy' | 'needs_attention' | 'critical' = 'healthy';
       const criticalCount = recommendations.filter(r => r.priority === 'critical' || r.priority === 'high').length;
       
@@ -271,8 +240,6 @@ export const analyzeSensorData = async (req: Request, res: Response) => {
       });
     }
 
-    console.log('✅ Analysis completed for', analysisResults.length, 'plants');
-
     res.json({
       success: true,
       data: {
@@ -293,7 +260,7 @@ export const analyzeSensorData = async (req: Request, res: Response) => {
   }
 };
 
-// POST /api/sensors/simulate-iot - Симуляция получения данных от IoT устройств
+// POST /api/sensors/simulate-iot
 export const simulateIoTData = async (req: Request, res: Response) => {
   try {
     const { plant_ids } = req.body;
@@ -304,13 +271,10 @@ export const simulateIoTData = async (req: Request, res: Response) => {
         error: 'Plant IDs array is required'
       });
     }
-
-    console.log('📡 Simulating IoT data reception...');
     
     const simulatedData = [];
     
     for (const plantId of plant_ids) {
-      // Находим датчики для этого растения
       const sensors = await Sensor.findAll({
         where: { 
           plant_id: plantId,
@@ -332,26 +296,22 @@ export const simulateIoTData = async (req: Request, res: Response) => {
 
       for (const sensor of sensors) {
         let simulatedValue: number;
-        
-        // Генерируем реалистичные данные с отклонениями
+
         switch (sensor.sensor_type) {
           case 'humidity':
             const optimalHumidity = sensor.plant.plantType.optimal_humidity;
-            // Генерируем значения с отклонением от -20 до +25
             simulatedValue = optimalHumidity + (Math.random() - 0.4) * 45;
-            simulatedValue = Math.max(10, Math.min(95, simulatedValue)); // ограничиваем диапазон
+            simulatedValue = Math.max(10, Math.min(95, simulatedValue));
             break;
             
           case 'temperature':
             const optimalTemp = sensor.plant.plantType.optimal_temperature;
-            // Генерируем значения с отклонением от -8 до +8
             simulatedValue = optimalTemp + (Math.random() - 0.5) * 16;
             simulatedValue = Math.max(5, Math.min(40, simulatedValue));
             break;
             
           case 'light':
             const optimalLight = sensor.plant.plantType.optimal_light;
-            // Генерируем значения с отклонением от -5000 до +5000
             simulatedValue = optimalLight + (Math.random() - 0.5) * 10000;
             simulatedValue = Math.max(0, Math.min(50000, simulatedValue));
             break;
@@ -360,7 +320,6 @@ export const simulateIoTData = async (req: Request, res: Response) => {
             simulatedValue = Math.random() * 100;
         }
 
-        // Сохраняем данные в базу
         const sensorData = await SensorData.create({
           sensor_id: sensor.sensor_id,
           value: Math.round(simulatedValue * 100) / 100
@@ -375,8 +334,6 @@ export const simulateIoTData = async (req: Request, res: Response) => {
         });
       }
     }
-
-    console.log('✅ IoT simulation completed:', simulatedData.length, 'data points');
 
     res.json({
       success: true,

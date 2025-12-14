@@ -11,7 +11,6 @@ class SensorData extends Model<SensorDataInterface, SensorDataCreationAttributes
   declare readonly timestamp: Date;
   declare readonly created_at: Date;
 
-  // Ассоциации
   declare sensor?: any;
 }
 

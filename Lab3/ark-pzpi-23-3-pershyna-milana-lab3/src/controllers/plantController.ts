@@ -2,7 +2,7 @@ import { Request, Response } from 'express';
 import { Plant, User, PlantType } from '../models';
 import { ApiResponse, CreatePlantRequest } from '../types';
 
-// GET /api/plants - Получить все растения
+// GET /api/plants
 export const getAllPlants = async (req: Request, res: Response) => {
   try {
     const plants = await Plant.findAll({
@@ -37,7 +37,7 @@ export const getAllPlants = async (req: Request, res: Response) => {
   }
 };
 
-// GET /api/plants/:id - Получить растение по ID
+// GET /api/plants/:id
 export const getPlantById = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
@@ -80,7 +80,7 @@ export const getPlantById = async (req: Request, res: Response) => {
   }
 };
 
-// GET /api/users/:userId/plants - Получить растения пользователя
+// GET /api/users/:userId/plants
 export const getPlantsByUserId = async (req: Request, res: Response) => {
   try {
     const { userId } = req.params;
@@ -112,12 +112,11 @@ export const getPlantsByUserId = async (req: Request, res: Response) => {
   }
 };
 
-// POST /api/plants - Создать новое растение
+// POST /api/plants
 export const createPlant = async (req: Request, res: Response) => {
   try {
     const { user_id, plant_type_id, name, location }: CreatePlantRequest = req.body;
-    
-    // Проверяем существование пользователя
+
     const user = await User.findByPk(user_id);
     if (!user) {
       const response: ApiResponse<null> = {
@@ -126,8 +125,7 @@ export const createPlant = async (req: Request, res: Response) => {
       };
       return res.status(400).json(response);
     }
-    
-    // Проверяем существование типа растения
+
     const plantType = await PlantType.findByPk(plant_type_id);
     if (!plantType) {
       const response: ApiResponse<null> = {
@@ -144,7 +142,6 @@ export const createPlant = async (req: Request, res: Response) => {
       location
     });
     
-    // Получаем созданное растение с включенными связями
     const createdPlant = await Plant.findByPk(plant.plant_id, {
       include: [
         {
@@ -176,7 +173,7 @@ export const createPlant = async (req: Request, res: Response) => {
   }
 };
 
-// PUT /api/plants/:id - Обновить растение
+// PUT /api/plants/:id 
 export const updatePlant = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
@@ -191,7 +188,6 @@ export const updatePlant = async (req: Request, res: Response) => {
       return res.status(404).json(response);
     }
     
-    // Если обновляется тип растения, проверяем его существование
     if (plant_type_id && plant_type_id !== plant.plant_type_id) {
       const plantType = await PlantType.findByPk(plant_type_id);
       if (!plantType) {
@@ -209,7 +205,6 @@ export const updatePlant = async (req: Request, res: Response) => {
       plant_type_id: plant_type_id || plant.plant_type_id
     });
     
-    // Получаем обновленное растение с включенными связями
     const updatedPlant = await Plant.findByPk(id, {
       include: [
         {
@@ -241,7 +236,7 @@ export const updatePlant = async (req: Request, res: Response) => {
   }
 };
 
-// DELETE /api/plants/:id - Удалить растение
+// DELETE /api/plants/:id
 export const deletePlant = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;

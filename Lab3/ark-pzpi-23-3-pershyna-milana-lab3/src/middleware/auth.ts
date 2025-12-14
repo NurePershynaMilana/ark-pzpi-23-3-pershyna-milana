@@ -3,7 +3,6 @@ import jwt from 'jsonwebtoken';
 import { User } from '../models';
 import { ApiResponse } from '../types';
 
-// Extend Request interface to include user
 declare global {
   namespace Express {
     interface Request {
@@ -14,7 +13,6 @@ declare global {
 
 const JWT_SECRET = process.env.JWT_SECRET || 'your_super_secret_jwt_key_here';
 
-// Ensure JWT_SECRET is defined
 if (!JWT_SECRET) {
   throw new Error('JWT_SECRET environment variable is required');
 }
@@ -22,13 +20,10 @@ if (!JWT_SECRET) {
 // Middleware to check if user is authenticated
 export const requireAuth = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    console.log('🔍 Auth Middleware - Headers:', req.headers);
-    
     const authHeader = req.headers.authorization;
-    console.log('🔍 Auth Header:', authHeader);
     
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      console.log('❌ No valid authorization header found');
+      console.log('No valid authorization header found');
       const response: ApiResponse<null> = {
         success: false,
         error: 'Access token is required'
@@ -36,23 +31,16 @@ export const requireAuth = async (req: Request, res: Response, next: NextFunctio
       return res.status(401).json(response);
     }
     
-    const token = authHeader.substring(7); // Remove 'Bearer ' prefix
-    console.log('🔍 Extracted Token:', token.substring(0, 20) + '...');
+    const token = authHeader.substring(7);
     
     // Verify JWT token
-    console.log('🔍 JWT_SECRET exists:', !!JWT_SECRET);
     const decoded = jwt.verify(token, JWT_SECRET) as any;
-    console.log('🔍 Decoded Token:', decoded);
-    
-    // Find user by ID from token
+ 
     const user = await User.findByPk(decoded.userId, {
       attributes: { exclude: ['password_hash'] }
     });
     
-    console.log('🔍 Found User:', user ? `ID: ${user.user_id}, Email: ${user.email}` : 'Not found');
-    
     if (!user) {
-      console.log('❌ User not found in database');
       const response: ApiResponse<null> = {
         success: false,
         error: 'User not found'
@@ -60,13 +48,12 @@ export const requireAuth = async (req: Request, res: Response, next: NextFunctio
       return res.status(401).json(response);
     }
     
-    // Add user to request object
     req.user = user;
-    console.log('✅ Auth successful, user added to request');
+    console.log('Auth successful, user added to request');
     next();
     
   } catch (error) {
-    console.error('❌ Full error:', error);
+    console.error('Full error:', error);
     const response: ApiResponse<null> = {
       success: false,
       error: 'Invalid or expired token'
@@ -117,12 +104,10 @@ export const requireOwnershipOrAdmin = (resourceKey: string = 'user_id') => {
         return res.status(401).json(response);
       }
       
-      // Admin can access everything
       if (req.user.role === 'admin') {
         return next();
       }
       
-      // Check ownership - get user_id from params or body
       const resourceUserId = req.params.userId || req.body[resourceKey];
       
       if (!resourceUserId || parseInt(resourceUserId) !== req.user.user_id) {

@@ -11,7 +11,6 @@ class Sensor extends Model<SensorInterface, SensorCreationAttributes> implements
   declare hardware_id: string;
   declare is_active: boolean;
 
-  // Ассоциации
   declare plant?: any;
   declare sensorData?: any[];
 }

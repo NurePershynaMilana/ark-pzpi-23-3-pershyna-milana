@@ -7,17 +7,15 @@ import { ApiResponse, RegisterRequest, LoginRequest, LoginResponse } from '../ty
 const JWT_SECRET = process.env.JWT_SECRET || 'your_super_secret_jwt_key_here';
 const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || '24h';
 
-// Ensure JWT_SECRET is a string for TypeScript
 if (!JWT_SECRET) {
   throw new Error('JWT_SECRET is required');
 }
 
-// POST /api/auth/register - Register new user
+// POST /api/auth/register
 export const register = async (req: Request, res: Response) => {
   try {
     const { email, first_name, last_name, password }: RegisterRequest = req.body;
-    
-    // Validation
+
     if (!email || !first_name || !last_name || !password) {
       return res.status(400).json({
         success: false,
@@ -32,7 +30,6 @@ export const register = async (req: Request, res: Response) => {
       });
     }
     
-    // Check if user already exists
     const existingUser = await User.findOne({ where: { email } });
     if (existingUser) {
       return res.status(400).json({
@@ -45,7 +42,6 @@ export const register = async (req: Request, res: Response) => {
     const saltRounds = 10;
     const password_hash = await bcrypt.hash(password, saltRounds);
     
-    // Create user
     await User.create({
       email: String(email),
       first_name: String(first_name),
@@ -53,8 +49,7 @@ export const register = async (req: Request, res: Response) => {
       password_hash,
       role: 'user'
     });
-    
-    // Find the created user (exclude password_hash from response)
+
     const user = await User.findOne({ 
       where: { email },
       attributes: { exclude: ['password_hash'] }
@@ -89,20 +84,18 @@ export const register = async (req: Request, res: Response) => {
   }
 };
 
-// POST /api/auth/login - User login
+// POST /api/auth/login
 export const login = async (req: Request, res: Response) => {
   try {
     const { email, password }: LoginRequest = req.body;
-    
-    // Validation
+
     if (!email || !password) {
       return res.status(400).json({
         success: false,
         error: 'Email and password are required'
       });
     }
-    
-    // Find user by email (include password_hash for verification)
+
     const user = await User.findOne({ where: { email } });
     if (!user) {
       return res.status(401).json({
@@ -110,16 +103,14 @@ export const login = async (req: Request, res: Response) => {
         error: 'Invalid email or password'
       });
     }
-    
-    // Verify password_hash exists
+
     if (!user.password_hash) {
       return res.status(500).json({
         success: false,
         error: 'User data corrupted'
       });
     }
-    
-    // Check password
+
     const isPasswordValid = await bcrypt.compare(password, user.password_hash);
     if (!isPasswordValid) {
       return res.status(401).json({
@@ -127,18 +118,15 @@ export const login = async (req: Request, res: Response) => {
         error: 'Invalid email or password'
       });
     }
-    
-    // Generate JWT token
+
     const token = jwt.sign(
       { userId: user.user_id, email: user.email, role: user.role },
       JWT_SECRET as jwt.Secret,
       { expiresIn: JWT_EXPIRES_IN } as jwt.SignOptions
     );
     
-    // Update last_login
     await user.update({ last_login: new Date() });
     
-    // Return response (exclude password_hash)
     res.json({
       success: true,
       data: {
@@ -166,7 +154,7 @@ export const login = async (req: Request, res: Response) => {
   }
 };
 
-// POST /api/auth/logout - User logout
+// POST /api/auth/logout 
 export const logout = async (req: Request, res: Response) => {
   try {
     res.json({
@@ -182,7 +170,7 @@ export const logout = async (req: Request, res: Response) => {
   }
 };
 
-// GET /api/auth/me - Get current user profile
+// GET /api/auth/me
 export const getCurrentUser = async (req: Request, res: Response) => {
   try {
     const user = req.user;

@@ -2,7 +2,7 @@ import { Request, Response } from 'express';
 import { PlantType } from '../models';
 import { ApiResponse } from '../types';
 
-// GET /api/plant-types - Получить все типы растений
+// GET /api/plant-types
 export const getAllPlantTypes = async (req: Request, res: Response) => {
   try {
     const plantTypes = await PlantType.findAll();
@@ -24,7 +24,7 @@ export const getAllPlantTypes = async (req: Request, res: Response) => {
   }
 };
 
-// GET /api/plant-types/:id - Получить тип растения по ID
+// GET /api/plant-types/:id
 export const getPlantTypeById = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
@@ -55,7 +55,7 @@ export const getPlantTypeById = async (req: Request, res: Response) => {
   }
 };
 
-// POST /api/plant-types - Создать новый тип растения
+// POST /api/plant-types
 export const createPlantType = async (req: Request, res: Response) => {
   try {
     const { name, optimal_humidity, optimal_temperature, optimal_light, watering_frequency } = req.body;
@@ -85,7 +85,7 @@ export const createPlantType = async (req: Request, res: Response) => {
   }
 };
 
-// PUT /api/plant-types/:id - Обновить тип растения
+// PUT /api/plant-types/:id
 export const updatePlantType = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
@@ -125,7 +125,7 @@ export const updatePlantType = async (req: Request, res: Response) => {
   }
 };
 
-// DELETE /api/plant-types/:id - Удалить тип растения
+// DELETE /api/plant-types/:id
 export const deletePlantType = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;

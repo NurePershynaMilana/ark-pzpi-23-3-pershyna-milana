@@ -3,7 +3,7 @@ import { Op } from 'sequelize';
 import { SensorData, Sensor, Plant } from '../models';
 import { ApiResponse, CreateSensorDataRequest } from '../types';
 
-// GET /api/sensor-data - Получить все данные датчиков
+// GET /api/sensor-data
 export const getAllSensorData = async (req: Request, res: Response) => {
   try {
     const { limit = 100, offset = 0 } = req.query;
@@ -45,7 +45,7 @@ export const getAllSensorData = async (req: Request, res: Response) => {
   }
 };
 
-// GET /api/sensor-data/:id - Получить данные датчика по ID
+// GET /api/sensor-data/:id
 export const getSensorDataById = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
@@ -90,13 +90,12 @@ export const getSensorDataById = async (req: Request, res: Response) => {
   }
 };
 
-// GET /api/sensors/:sensorId/data - Получить данные конкретного датчика
+// GET /api/sensors/:sensorId/data
 export const getDataBySensorId = async (req: Request, res: Response) => {
   try {
     const { sensorId } = req.params;
     const { limit = 100, offset = 0, from, to } = req.query;
-    
-    // Формируем условие для фильтрации по времени
+
     let whereClause: any = { sensor_id: sensorId };
     
     if (from || to) {
@@ -129,12 +128,11 @@ export const getDataBySensorId = async (req: Request, res: Response) => {
   }
 };
 
-// POST /api/sensor-data - Создать новую запись данных датчика
+// POST /api/sensor-data
 export const createSensorData = async (req: Request, res: Response) => {
   try {
     const { sensor_id, value }: CreateSensorDataRequest = req.body;
-    
-    // Проверяем существование датчика
+
     const sensor = await Sensor.findByPk(sensor_id);
     if (!sensor) {
       const response: ApiResponse<null> = {
@@ -143,8 +141,7 @@ export const createSensorData = async (req: Request, res: Response) => {
       };
       return res.status(400).json(response);
     }
-    
-    // Проверяем, активен ли датчик
+
     if (!sensor.is_active) {
       const response: ApiResponse<null> = {
         success: false,
@@ -175,11 +172,10 @@ export const createSensorData = async (req: Request, res: Response) => {
   }
 };
 
-// POST /api/sensor-data/bulk - Создать множество записей данных (для IoT)
+// POST /api/sensor-data/bulk 
 export const createBulkSensorData = async (req: Request, res: Response) => {
   try {
-    const { data } = req.body; // массив объектов {sensor_id, value}
-    
+    const { data } = req.body;
     if (!Array.isArray(data) || data.length === 0) {
       const response: ApiResponse<null> = {
         success: false,
@@ -187,8 +183,7 @@ export const createBulkSensorData = async (req: Request, res: Response) => {
       };
       return res.status(400).json(response);
     }
-    
-    // Проверяем все sensor_id
+
     const sensorIds = data.map(item => item.sensor_id);
     const sensors = await Sensor.findAll({
       where: { sensor_id: { [Op.in]: sensorIds }, is_active: true }
@@ -221,7 +216,7 @@ export const createBulkSensorData = async (req: Request, res: Response) => {
   }
 };
 
-// DELETE /api/sensor-data/:id - Удалить запись данных датчика
+// DELETE /api/sensor-data/:id
 export const deleteSensorData = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;

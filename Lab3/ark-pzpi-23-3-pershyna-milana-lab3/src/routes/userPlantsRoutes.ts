@@ -10,7 +10,6 @@ import { requireAuth } from '../middleware/auth';
 
 const router = Router();
 
-// Все маршруты требуют аутентификации
 router.use(requireAuth);
 
 /**

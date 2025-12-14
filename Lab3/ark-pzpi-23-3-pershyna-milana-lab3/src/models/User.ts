@@ -26,7 +26,6 @@ class User extends Model<UserInterface, UserCreationAttributes> implements UserI
   declare readonly created_at: Date;
   declare readonly updated_at: Date;
 
-  // Ассоциации
   declare plants?: any[];
 }
 

@@ -13,7 +13,6 @@ class Plant extends Model<PlantInterface, PlantCreationAttributes> implements Pl
   declare readonly created_at: Date;
   declare readonly updated_at: Date;
 
-  // Ассоциации
   declare user?: any;
   declare plantType?: any;
   declare sensors?: any[];

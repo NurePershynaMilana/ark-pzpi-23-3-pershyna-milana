@@ -12,7 +12,6 @@ class PlantType extends Model<PlantTypeInterface, PlantTypeCreationAttributes> i
   declare optimal_light: number;
   declare watering_frequency: number;
 
-  // Ассоциации
   declare plants?: any[];
 }
 

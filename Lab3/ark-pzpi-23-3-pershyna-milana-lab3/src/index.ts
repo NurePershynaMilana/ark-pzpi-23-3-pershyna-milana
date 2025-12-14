@@ -8,19 +8,16 @@ import swaggerUi from 'swagger-ui-express';
 import { sequelize } from './models';
 import routes from './routes';
 
-// Загружаем переменные окружения
 dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Middleware
-app.use(helmet()); // Безопасность
-app.use(cors()); // CORS
-app.use(express.json()); // Парсинг JSON
-app.use(express.urlencoded({ extended: true })); // Парсинг URL-encoded данных
+app.use(helmet()); 
+app.use(cors()); 
+app.use(express.json()); 
+app.use(express.urlencoded({ extended: true }));
 
-// Swagger конфигурация
 const swaggerOptions = {
   definition: {
     openapi: '3.0.0',
@@ -62,18 +59,15 @@ const swaggerOptions = {
       }
     ]
   },
-  apis: ['./src/routes/*.ts'], // шлях до файлів з API документацією
+  apis: ['./src/routes/*.ts'],
 };
 
 const specs = swaggerJsdoc(swaggerOptions);
 
-// API документация
 app.use('/api/docs', swaggerUi.serve, swaggerUi.setup(specs));
 
-// API маршруты
 app.use('/api', routes);
 
-// Базовий маршрут
 app.get('/', (req, res) => {
   res.json({
     message: 'Plant Care System Backend - Lab 2',
@@ -87,17 +81,15 @@ app.get('/', (req, res) => {
   });
 });
 
-// Health check endpoint
 app.get('/health', (req, res) => {
   res.json({
     status: 'OK',
     timestamp: new Date().toISOString(),
     uptime: process.uptime(),
-    database: 'Connected' // можна додати реальну перевірку БД
+    database: 'Connected'
   });
 });
 
-// Обработка 404
 app.use('*', (req, res) => {
   res.status(404).json({
     success: false,
@@ -106,7 +98,6 @@ app.use('*', (req, res) => {
   });
 });
 
-// Глобальная обработка ошибок
 app.use((error: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
   console.error('Global error handler:', error);
   
@@ -117,34 +108,30 @@ app.use((error: any, req: express.Request, res: express.Response, next: express.
   });
 });
 
-// Функция для запуска сервера
+
 async function startServer() {
   try {
-    // Тестируем подключение к БД
     await sequelize.authenticate();
-    console.log('✅ Database connection established successfully');
-    
-    // Синхронизация моделей с БД (в продакшене лучше использовать миграции)
+    console.log('Database connection established successfully');
+
     if (process.env.NODE_ENV === 'development') {
       await sequelize.sync({ force: false, alter: false });
-      console.log('✅ Database models synchronized');
+      console.log('Database models synchronized');
     }
-    
-    // Запускаем сервер
+
     app.listen(PORT, () => {
-      console.log(`🚀 Server is running on port ${PORT}`);
-      console.log(`📖 API Documentation: http://localhost:${PORT}/api/docs`);
-      console.log(`🌐 API Base URL: http://localhost:${PORT}/api`);
-      console.log(`💚 Health Check: http://localhost:${PORT}/health`);
+      console.log(`Server is running on port ${PORT}`);
+      console.log(`API Documentation: http://localhost:${PORT}/api/docs`);
+      console.log(`API Base URL: http://localhost:${PORT}/api`);
+      console.log(`Health Check: http://localhost:${PORT}/health`);
     });
     
   } catch (error) {
-    console.error('❌ Unable to start server:', error);
+    console.error('Unable to start server:', error);
     process.exit(1);
   }
 }
 
-// Запускаем сервер
 startServer();
 
 export default app;
