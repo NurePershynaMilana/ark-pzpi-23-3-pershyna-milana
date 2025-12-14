@@ -1,5 +1,3 @@
-// Основні типи для API
-
 export interface User {
   user_id?: number;
   email: string;
@@ -45,7 +43,6 @@ export interface SensorData {
   created_at?: Date;
 }
 
-// API Response типи
 export interface ApiResponse<T> {
   success: boolean;
   data?: T;
@@ -53,7 +50,6 @@ export interface ApiResponse<T> {
   error?: string;
 }
 
-// Request body типи
 export interface CreateUserRequest {
   email: string;
   first_name: string;

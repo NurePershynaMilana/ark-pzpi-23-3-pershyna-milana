@@ -2,7 +2,6 @@ import { DataTypes, Model, Optional } from 'sequelize';
 import sequelize from '../config/database';
 import { User as UserInterface } from '../types';
 
-// Атрибуты для создания пользователя
 interface UserCreationAttributes extends Optional<UserInterface, 'user_id' | 'created_at' | 'updated_at'> {}
 
 class User extends Model<UserInterface, UserCreationAttributes> implements UserInterface {

@@ -3,10 +3,8 @@ import userRoutes from './userRoutes';
 
 const router = Router();
 
-// Подключение маршрутов
 router.use('/users', userRoutes);
 
-// Базовый маршрут для проверки API
 router.get('/', (req, res) => {
   res.json({
     success: true,

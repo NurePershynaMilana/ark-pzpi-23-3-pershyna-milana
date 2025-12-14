@@ -2,7 +2,7 @@ import { Request, Response } from 'express';
 import { Sensor, Plant } from '../models';
 import { ApiResponse } from '../types';
 
-// GET /api/sensors - Получить все датчики
+// GET /api/sensors
 export const getAllSensors = async (req: Request, res: Response) => {
   try {
     const sensors = await Sensor.findAll({
@@ -32,7 +32,7 @@ export const getAllSensors = async (req: Request, res: Response) => {
   }
 };
 
-// GET /api/sensors/:id - Получить датчик по ID
+// GET /api/sensors/:id
 export const getSensorById = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
@@ -71,7 +71,7 @@ export const getSensorById = async (req: Request, res: Response) => {
   }
 };
 
-// GET /api/plants/:plantId/sensors - Получить датчики растения
+// GET /api/plants/:plantId/sensors
 export const getSensorsByPlantId = async (req: Request, res: Response) => {
   try {
     const { plantId } = req.params;
@@ -97,12 +97,11 @@ export const getSensorsByPlantId = async (req: Request, res: Response) => {
   }
 };
 
-// POST /api/sensors - Создать новый датчик
+// POST /api/sensors
 export const createSensor = async (req: Request, res: Response) => {
   try {
     const { plant_id, sensor_type, hardware_id, is_active = true } = req.body;
-    
-    // Проверяем существование растения
+
     const plant = await Plant.findByPk(plant_id);
     if (!plant) {
       const response: ApiResponse<null> = {
@@ -111,8 +110,7 @@ export const createSensor = async (req: Request, res: Response) => {
       };
       return res.status(400).json(response);
     }
-    
-    // Проверяем уникальность hardware_id
+
     const existingSensor = await Sensor.findOne({ where: { hardware_id } });
     if (existingSensor) {
       const response: ApiResponse<null> = {
@@ -128,8 +126,7 @@ export const createSensor = async (req: Request, res: Response) => {
       hardware_id,
       is_active
     });
-    
-    // Получаем созданный датчик с включенными связями
+
     const createdSensor = await Sensor.findByPk(sensor.sensor_id, {
       include: [
         {
@@ -157,7 +154,7 @@ export const createSensor = async (req: Request, res: Response) => {
   }
 };
 
-// PUT /api/sensors/:id - Обновить датчик
+// PUT /api/sensors/:id
 export const updateSensor = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
@@ -171,8 +168,7 @@ export const updateSensor = async (req: Request, res: Response) => {
       };
       return res.status(404).json(response);
     }
-    
-    // Проверяем уникальность hardware_id при обновлении
+
     if (hardware_id && hardware_id !== sensor.hardware_id) {
       const existingSensor = await Sensor.findOne({ where: { hardware_id } });
       if (existingSensor) {
@@ -189,8 +185,7 @@ export const updateSensor = async (req: Request, res: Response) => {
       hardware_id: hardware_id || sensor.hardware_id,
       is_active: is_active !== undefined ? is_active : sensor.is_active
     });
-    
-    // Получаем обновленный датчик с включенными связями
+
     const updatedSensor = await Sensor.findByPk(id, {
       include: [
         {
@@ -218,7 +213,7 @@ export const updateSensor = async (req: Request, res: Response) => {
   }
 };
 
-// DELETE /api/sensors/:id - Удалить датчик
+// DELETE /api/sensors/:id
 export const deleteSensor = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;

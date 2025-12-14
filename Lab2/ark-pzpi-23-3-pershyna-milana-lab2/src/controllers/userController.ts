@@ -3,11 +3,11 @@ import bcrypt from 'bcryptjs';
 import { User } from '../models';
 import { ApiResponse, CreateUserRequest } from '../types';
 
-// GET /api/users - Получить всех пользователей
+// GET /api/users
 export const getAllUsers = async (req: Request, res: Response) => {
   try {
     const users = await User.findAll({
-      attributes: { exclude: ['password_hash'] } // Исключаем пароль из ответа
+      attributes: { exclude: ['password_hash'] }
     });
     
     const response: ApiResponse<typeof users> = {
@@ -27,7 +27,7 @@ export const getAllUsers = async (req: Request, res: Response) => {
   }
 };
 
-// GET /api/users/:id - Получить пользователя по ID
+// GET /api/users/:id
 export const getUserById = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
@@ -60,12 +60,11 @@ export const getUserById = async (req: Request, res: Response) => {
   }
 };
 
-// POST /api/users - Создать нового пользователя
+// POST /api/users
 export const createUser = async (req: Request, res: Response) => {
   try {
     const { email, first_name, last_name, password }: CreateUserRequest = req.body;
-    
-    // Проверяем, не существует ли пользователь с таким email
+
     const existingUser = await User.findOne({ where: { email } });
     if (existingUser) {
       const response: ApiResponse<null> = {
@@ -74,20 +73,17 @@ export const createUser = async (req: Request, res: Response) => {
       };
       return res.status(400).json(response);
     }
-    
-    // Хэшируем пароль
+
     const saltRounds = 10;
     const password_hash = await bcrypt.hash(password, saltRounds);
-    
-    // Создаем пользователя
+
     const user = await User.create({
       email,
       first_name,
       last_name,
       password_hash
     });
-    
-    // Возвращаем пользователя без пароля
+
     const userResponse = await User.findByPk(user.user_id, {
       attributes: { exclude: ['password_hash'] }
     });
@@ -109,7 +105,7 @@ export const createUser = async (req: Request, res: Response) => {
   }
 };
 
-// PUT /api/users/:id - Обновить пользователя
+// PUT /api/users/:id
 export const updateUser = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
@@ -124,14 +120,12 @@ export const updateUser = async (req: Request, res: Response) => {
       return res.status(404).json(response);
     }
     
-    // Обновляем пользователя
     await user.update({
       email: email || user.email,
       first_name: first_name || user.first_name,
       last_name: last_name || user.last_name
     });
-    
-    // Возвращаем обновленного пользователя без пароля
+
     const updatedUser = await User.findByPk(id, {
       attributes: { exclude: ['password_hash'] }
     });
@@ -153,7 +147,7 @@ export const updateUser = async (req: Request, res: Response) => {
   }
 };
 
-// DELETE /api/users/:id - Удалить пользователя
+// DELETE /api/users/:id
 export const deleteUser = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
