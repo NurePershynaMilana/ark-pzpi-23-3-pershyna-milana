@@ -1,0 +1,54 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: plant_care_db
+    restart: always
+    environment:
+      POSTGRES_DB: plant_care
+      POSTGRES_USER: plant_user
+      POSTGRES_PASSWORD: plant_password
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./database/init:/docker-entrypoint-initdb.d
+    networks:
+      - plant_care_network
+
+  backend:
+    build: .
+    container_name: plant_care_backend
+    restart: always
+    ports:
+      - "3000:3000"
+    depends_on:
+      - postgres
+    environment:
+      - NODE_ENV=development
+      - DATABASE_URL=postgresql://plant_user:plant_password@postgres:5432/plant_care
+      - DB_HOST=postgres
+      - DB_PORT=5432
+      - DB_NAME=plant_care
+      - DB_USER=plant_user
+      - DB_PASSWORD=plant_password
+      - PORT=3000
+    networks:
+      - plant_care_network
+    develop:
+      watch:
+        - action: sync
+          path: ./src
+          target: /app/src
+          ignore:
+            - node_modules/
+        - action: rebuild
+          path: package.json
+
+volumes:
+  postgres_data:
+
+networks:
+  plant_care_network:
+    driver: bridge
