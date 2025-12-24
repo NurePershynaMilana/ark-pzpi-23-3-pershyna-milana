@@ -42,7 +42,7 @@ Servo wateringServo;
 
 // Global variables
 unsigned long lastCycle = 0;
-unsigned long cycleInterval = 30000; // 30 seconds for real backend
+unsigned long cycleInterval = 30000;
 bool isWatering = false;
 bool isLightingOn = false;
 unsigned long wateringStartTime = 0;
@@ -61,7 +61,7 @@ void setup() {
   Serial.begin(115200);
   delay(2000);
   
-  Serial.println("🌱 PlantCare IoT Client - Production Mode");
+  Serial.println("🌱 PlantCare IoT Client");
   
   // Initialize components
   dht.begin();
@@ -94,14 +94,14 @@ void loop() {
 }
 
 void performMonitoringCycle() {
-  Serial.println("\n🔄 Monitoring violet...");
+  Serial.println("\nMonitoring");
   setLEDStatus("reading");
   
   // Read sensors
   SensorReading reading = readAllSensors();
   
   if (!reading.isValid) {
-    Serial.println("❌ Sensor reading failed");
+    Serial.println("Sensor reading failed");
     setLEDStatus("error");
     return;
   }
@@ -109,7 +109,7 @@ void performMonitoringCycle() {
   // Send data to backend
   setLEDStatus("transmitting");
   if (!sendSensorDataToServer(reading)) {
-    Serial.println("❌ Failed to send data");
+    Serial.println("Failed to send data");
     setLEDStatus("error");
     return;
   }
@@ -138,7 +138,7 @@ SensorReading readAllSensors() {
   int rawSoil = analogRead(SOIL_MOISTURE_PIN);
   reading.soilMoisture = map(rawSoil, 0, 4095, 0, 100);
   
-  // Soil temperature (default if sensor missing)
+  // Soil temperature
   reading.soilTemperature = 22.0;
   
   // Validation
@@ -146,7 +146,7 @@ SensorReading readAllSensors() {
     reading.isValid = false;
   }
   
-  Serial.printf("🌺 Фіалка: %.1f°C, %.1f%% RH, %d%% soil, %d lux\n", 
+  Serial.printf("Фіалка: %.1f°C, %.1f%% RH, %d%% soil, %d lux\n", 
                 reading.airTemperature, reading.airHumidity, 
                 reading.soilMoisture, reading.lightLevel);
   
@@ -198,7 +198,7 @@ bool sendSensorDataToServer(SensorReading &reading) {
   int httpResponseCode = http.POST(jsonString);
   String response = http.getString();
   
-  Serial.printf("📤 Data sent - Response: %d\n", httpResponseCode);
+  Serial.printf("Data sent - Response: %d\n", httpResponseCode);
   
   bool success = (httpResponseCode == 200 || httpResponseCode == 201);
   http.end();
@@ -231,7 +231,7 @@ bool requestAnalysisFromServer() {
   int httpResponseCode = http.POST(requestJson);
   String response = http.getString();
   
-  Serial.printf("🧠 Analysis response: %d\n", httpResponseCode);
+  Serial.printf("Analysis response: %d\n", httpResponseCode);
   
   if (httpResponseCode == 200 || httpResponseCode == 201) {
     parseAndExecuteCommands(response);
@@ -254,9 +254,9 @@ void parseAndExecuteCommands(String jsonResponse) {
   // Show readable summary if available
   if (doc["data"]["iot_summary"]) {
     String summary = doc["data"]["iot_summary"];
-    Serial.println("\n📋 === BACKEND ANALYSIS ===");
+    Serial.println("\n=== BACKEND ANALYSIS ===");
     Serial.println(summary);
-    Serial.println("📋 === END ANALYSIS ===");
+    Serial.println("=== END ANALYSIS ===");
   }
   
   // Execute commands
@@ -277,13 +277,12 @@ void parseAndExecuteCommands(String jsonResponse) {
       } else if (deviceType == "lighting" && action == "start") {
         executeLightingCommand();
       }
-      // heating and ventilation are console-only
     }
   }
 }
 
 void executeWateringCommand() {
-  Serial.println("💧 Watering violet...");
+  Serial.println("Watering violet...");
   isWatering = true;
   wateringStartTime = millis();
   wateringServo.write(90);
@@ -302,13 +301,13 @@ void handleActiveCommands() {
   if (isWatering && (millis() - wateringStartTime >= 3000)) {
     wateringServo.write(0);
     isWatering = false;
-    Serial.println("✅ Watering completed");
+    Serial.println("Watering completed");
   }
   
   // Handle lighting timeout
   if (isLightingOn && (millis() - lightingStartTime >= 30000)) {
     isLightingOn = false;
-    Serial.println("✅ Lighting completed");
+    Serial.println("Lighting completed");
   }
   
   // Return to ready state
@@ -333,7 +332,7 @@ void connectToWiFi() {
     Serial.print("📶 IP: ");
     Serial.println(WiFi.localIP());
   } else {
-    Serial.println("\n❌ WiFi failed!");
+    Serial.println("\nWiFi failed!");
     setLEDStatus("error");
   }
 }
@@ -344,21 +343,7 @@ void setLEDStatus(String status) {
   digitalWrite(LED_GREEN_PIN, LOW);
   digitalWrite(LED_BLUE_PIN, LOW);
   
-  if (status == "connecting") {
-    digitalWrite(LED_RED_PIN, HIGH);
-    digitalWrite(LED_GREEN_PIN, HIGH); // Yellow
-  }
-  else if (status == "ready") {
-    digitalWrite(LED_GREEN_PIN, HIGH); // Green
-  }
-  else if (status == "reading") {
-    digitalWrite(LED_BLUE_PIN, HIGH); // Blue
-  }
-  else if (status == "transmitting") {
-    digitalWrite(LED_RED_PIN, HIGH);
-    digitalWrite(LED_BLUE_PIN, HIGH); // Purple
-  }
-  else if (status == "lighting") {
+  if (status == "lighting") {
     // White light for grow lamp
     digitalWrite(LED_RED_PIN, HIGH);
     digitalWrite(LED_GREEN_PIN, HIGH);
